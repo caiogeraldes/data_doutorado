@@ -2,7 +2,7 @@ require(tidyverse)
 require(readxl)
 require(kableExtra)
 
-df <- read_xlsx("./Geral.xlsx", sheet = "PRINCIPAL")
+df <- read_xlsx("./raw/Geral.xlsx", sheet = "PRINCIPAL")
 write_csv(df, "geral.csv")
 geral <- read_csv(
   "geral.csv", col_types = cols(Anot = col_skip(),
