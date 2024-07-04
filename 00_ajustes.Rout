@@ -1,0 +1,88 @@
+
+R version 4.4.0 (2024-04-24) -- "Puppy Cup"
+Copyright (C) 2024 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu
+
+R é um software livre e vem sem GARANTIA ALGUMA.
+Você pode redistribuí-lo sob certas circunstâncias.
+Digite 'license()' ou 'licence()' para detalhes de distribuição.
+
+R é um projeto colaborativo com muitos contribuidores.
+Digite 'contributors()' para obter mais informações e
+'citation()' para saber como citar o R ou pacotes do R em publicações.
+
+Digite 'demo()' para demonstrações, 'help()' para o sistema on-line de ajuda,
+ou 'help.start()' para abrir o sistema de ajuda em HTML no seu navegador.
+Digite 'q()' para sair do R.
+
+> ## Preparação
+> library(tidyverse)
+── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
+✔ dplyr     1.1.4     ✔ readr     2.1.5
+✔ forcats   1.0.0     ✔ stringr   1.5.1
+✔ ggplot2   3.5.0     ✔ tibble    3.2.1
+✔ lubridate 1.9.3     ✔ tidyr     1.3.1
+✔ purrr     1.0.2     
+── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+✖ purrr::%||%()   masks base::%||%()
+✖ dplyr::filter() masks stats::filter()
+✖ dplyr::lag()    masks stats::lag()
+ℹ Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
+> library(readxl)
+> 
+> diogenes_results <- read_excel("./assets/data.xlsx", sheet = "Principal")
+> diogenes_results
+# A tibble: 9,454 × 18
+      ID AUTHOR  WORK  LOCATION TEXT  MV    SELECT CHECK MV_PERSONAL Anot  Vm   
+   <dbl> <chr>   <chr> <chr>    <chr> <chr> <chr>  <lgl> <lgl>       <chr> <chr>
+ 1     2 Aeschi… Agai… 2.11     οὕτω… δοκέω FALSE  FALSE FALSE       <NA>  <NA> 
+ 2     3 Aeschi… Agai… 79.1     ὡς γ… δοκέω FALSE  FALSE FALSE       <NA>  <NA> 
+ 3     4 Aeschi… Agai… 145.5    καὶ … δοκέω FALSE  FALSE FALSE       <NA>  <NA> 
+ 4     5 Aeschi… Agai… 155.4    καὶ … δοκέω FALSE  FALSE FALSE       <NA>  <NA> 
+ 5     6 Aeschi… Agai… 177.8    εἰ γ… δοκέω FALSE  FALSE FALSE       <NA>  <NA> 
+ 6     7 Aeschi… Agai… 181.1    πότε… δοκέω FALSE  FALSE FALSE       <NA>  <NA> 
+ 7     8 Aeschi… Agai… 183.4    οὗτο… δοκέω FALSE  FALSE FALSE       <NA>  <NA> 
+ 8     9 Aeschi… Agai… 250.1    ἢ οὐ… δοκέω FALSE  FALSE FALSE       <NA>  <NA> 
+ 9    10 Aeschi… Agai… 4.1      ἀλλά… δοκέω FALSE  FALSE FALSE       <NA>  <NA> 
+10    11 Aeschi… Agai… 25.1     καὶ … δοκέω FALSE  FALSE FALSE       <NA>  <NA> 
+# ℹ 9,444 more rows
+# ℹ 7 more variables: Vinf <chr>, Obj <chr>, Pred <chr>, Attr <lgl>,
+#   Attr_B <chr>, Vinf_Cop <lgl>, Column1 <lgl>
+> 
+> d <- diogenes_results %>% filter(diogenes_results$SELECT == TRUE)
+> 
+> mvi <- read_csv("./assets/mvi.csv")
+Rows: 43 Columns: 13
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr (6): lemma, xobj_case, opt_entry, opt_acc, short_def, cmt
+dbl (5): personal, impersonal, modal_semantics, personal_valid, impersonal_v...
+lgl (2): freq, ctxfreq
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+> mvi <- mvi %>%
++   mutate(
++     modal_semantics = (mvi$modal_semantics == 1),
++     personal = (mvi$personal == 1),
++     impersonal = (mvi$impersonal == 1)
++   )
+> modal_verbs <- (
++   mvi %>%
++     filter(mvi$modal_semantics)
++ )$lemma
+> modal_verbs
+ [1] "ἐγχωρέω"    "ἐκγίγνομαι" "ἔνειμι"     "ἐξαρκέω"    "ἔξεστι"    
+ [6] "ἐπιβάλλω"   "πόρω"       "πρέπω"      "προσδέομαι" "προσήκω"   
+[11] "συμβαίνω"   "συμπίπτω"   "συμφέρω"    "ὑπάρχω"    
+> 
+> d <- mutate(
++   d,
++   MOD_V = (d$MV %in% modal_verbs)
++ )
+> 
+> write_csv(d, "./processed/00_data_pre_processed.csv")
+> 
+> proc.time()
+  usuário   sistema decorrido 
+    1.658     0.138     1.783 
