@@ -1,125 +1,72 @@
 ---
-title: 'Dados: atração de caso em orações infinitivas'
-date: "`r Sys.Date()`"
-output:
-  pdf_document: 
-    latex_engine: lualatex
-  html_document:
-    df_print: paged
+title: "Análise de dados"
+output: html_notebook
 ---
 
-```{r message=FALSE, warning=FALSE}
-library(tidyverse)
-library(readxl)
+
+```{r message=FALSE, warning=FALSE, include=FALSE}
+require(tidyverse)
 library(kableExtra)
+require(vcd)
+require(FactoMineR)
+require(factoextra)
+require(ca)
 ```
 
-## Coleta
-```{r paged.print=TRUE}
-diogenes_results <- read_excel("./assets/data.xlsx",
-  sheet = "Principal"
+
+```{r}
+d <- read_csv(
+  "./processed/data_final.csv",
+  col_types = cols(
+    ID = col_double(),
+    AUTHOR = col_character(),
+    WORK = col_character(),
+    LOCATION = col_character(),
+    TEXT = col_character(),
+    Vm = col_character(),
+    VM_LEMMA = col_character(),
+    VM_PERSONAL = col_logical(),
+    VM_MOD = col_logical(),
+    Vinf = col_character(),
+    VINF_A = col_character(),
+    VINF_B = col_character(),
+    VINF_C = col_character(),
+    VINF_D = col_character(),
+    Vinf_Cop = col_logical(),
+    Obj = col_character(),
+    OBJ_A = col_character(),
+    OBJ_B = col_character(),
+    OBJ_C = col_character(),
+    Pred = col_character(),
+    PRED_A = col_character(),
+    PRED_B = col_character(),
+    PRED_C = col_character(),
+    PRED_D = col_character(),
+    PRED_E = col_character(),
+    PRED_F = col_character(),
+    PRED_G = col_character(),
+    Attr = col_logical(),
+    Attr_B = col_logical(),
+    CHECK = col_logical(),
+    Anot = col_character(),
+    DIST_OBJ_PRED = col_double()
+  )
 )
-diogenes_results
-```
-
-```{r message=FALSE, warning=FALSE, paged.print=TRUE}
-d <- read_csv("./processed/data_final.csv")
-attach(d)
 d
 ```
-
-### Resultados da coleta no Diogenes
-
-#### Autoria
-
-```{r}
-table(diogenes_results$AUTHOR) %>% kable(
-  col.names = c("Autor", "Freq"),
-  format = "latex"
-)
-```
-
-```{r}
-table(diogenes_results$AUTHOR) %>%
-  prop.table() %>%
-  kable(col.names = c("Autor", "Prop"),
-  format = "latex")
-```
-
-#### Verbo principal
-
-```{r paged.print=TRUE}
-table(diogenes_results$MV) %>% kable(col.names = c("Vm", "Freq"),
-  format = "latex")
-```
-
-```{r}
-table(diogenes_results$MV) %>%
-  prop.table() %>%
-  kable(col.names = c("Vm", "Prop"),
-  format = "latex")
-```
-
-#### Total de dados:
-
-```{r}
-nrow(diogenes_results)
-```
-
-### Dados filtrados
-
-#### Autoria
-
-```{r}
-table(d$AUTHOR) %>% kable(col.names = c("Autor", "Freq"),
-  format = "latex")
-```
-
-```{r}
-table(d$AUTHOR) %>%
-  prop.table() %>%
-  kable(col.names = c("Autor", "Prop"),
-  format = "latex")
-```
-
-#### Verbo principal
-```{r}
-table(d$VM_LEMMA) %>% kable(col.names = c("Vm", "Freq"),
-  format = "latex")
-```
-```{r}
-table(d$VM_LEMMA) %>%
-  prop.table() %>%
-  kable(col.names = c("Vm", "Prop"),
-  format = "latex")
-```
-
-#### Total de dados:
-```{r}
-nrow(d)
-```
-
-### Proporção de aproveitamento
-
-```{r}
-nrow(d) / nrow(diogenes_results)
-```
-
-## Análise primária
 
 ### Proporção geral de atração
 
 ```{r}
 table(d$Attr) %>%
   addmargins() %>%
-  kable(col.names = c("Atração", "Freq"),
-  format = "latex")
+  kable(col.names = c("Atração", "Freq"))
 ```
 ```{r}
 prop.table(table(d$Attr)) %>%
-  kable(col.names = c("Atração", "Prop"),
-  format = "latex")
+  kable(col.names = c("Atração", "Prop"))
 ```
+
 ```{r}
 p <- ggplot(d, aes(Attr)) +
   geom_bar(aes(fill = Attr), width = 0.7) +
@@ -148,8 +95,7 @@ table(d$VM_PERSONAL, d$Attr) %>%
       "Sem atração",
       "Atração",
       "Soma"
-    ),
-  format = "latex"
+    )
   )
 ```
 
@@ -161,8 +107,7 @@ table(d$VM_PERSONAL, d$Attr) %>%
       "Pessoal",
       "Sem atração",
       "Atração"
-    ),
-  format = "latex"
+    )
   )
 ```
 
@@ -188,10 +133,10 @@ table(d$VM_MOD, d$Attr) %>%
       "Sem atração",
       "Atração",
       "Soma"
-    ),
-  format = "latex"
+    )
   )
 ```
+
 ```{r}
 table(d$VM_MOD, d$Attr) %>%
   prop.table(margin = 1) %>%
@@ -200,10 +145,10 @@ table(d$VM_MOD, d$Attr) %>%
       "Vm Modalizador",
       "Sem atração",
       "Atração"
-    ),
-  format = "latex"
+    )
   )
 ```
+
 ```{r}
 table(d$VM_MOD, d$Attr) %>% chisq.test()
 ```
@@ -229,8 +174,7 @@ table(d$Vinf_Cop, d$Attr) %>%
       "Sem atração",
       "Atração",
       "Soma"
-    ),
-  format = "latex"
+    )
   )
 ```
 
@@ -242,8 +186,7 @@ table(d$Vinf_Cop, d$Attr) %>%
       "Vinf Copular",
       "Sem atração",
       "Atração"
-    ),
-  format = "latex"
+    )
   )
 ```
 
@@ -269,10 +212,10 @@ table(d$AUTHOR, d$Attr) %>%
       "Sem atração",
       "Atração",
       "Soma"
-    ),
-  format = "latex"
+    )
   )
 ```
+
 ```{r}
 table(d$AUTHOR, d$Attr) %>%
   prop.table(margin = 1) %>%
@@ -281,10 +224,10 @@ table(d$AUTHOR, d$Attr) %>%
       "Autoria",
       "Sem atração",
       "Atração"
-    ),
-  format = "latex"
+    )
   )
 ```
+
 ```{r}
 table(d$AUTHOR, d$Attr) %>% chisq.test()
 ```
@@ -306,9 +249,6 @@ ggplot(d, aes(y = AUTHOR)) +
 wilcox.test(d$DIST_OBJ_PRED ~ d$Attr, conf.int = TRUE)
 ```
 
-A diferença entre a média de distância é estatisticamente significativa, sendo 
-de aproximadamente 3 palavras.
-
 ```{r}
 b <- ggplot(d, aes(Attr, DIST_OBJ_PRED, fill = Attr)) +
   geom_boxplot(outlier.shape = 15, outlier.size = 2.4) +
@@ -323,4 +263,71 @@ b <- ggplot(d, aes(Attr, DIST_OBJ_PRED, fill = Attr)) +
   ) +
   scale_fill_brewer(palette = "Dark2")
 b
+```
+
+```{r}
+mca <- MCA(
+  d[,c(
+    "Attr",
+    "Vinf_Cop",
+    "VM_MOD",
+    "AUTHOR",
+    "DIST_OBJ_PRED"
+    )], 
+  quali.sup = 4,
+  quanti.sup = 5,
+  method="Burt",
+  graph = F)
+
+fviz_screeplot(
+  mca,
+  addlabels = TRUE,
+  ylim = c(0, 80),
+  barfill="#1B9E77",
+  barcolor="#1B9E77",
+  main="Eigenvalues"
+  ) + 
+  theme_get()
+
+mca.plot <- plot(
+  mca,
+  invisible = "ind",
+  graph.type =  "ggplot"
+  ) +
+  theme_get()
+mca.plot
+
+
+```
+
+
+```{r}
+mca.b <- MCA(
+  d[,c(
+    "Attr",
+    "Vinf_Cop",
+    "VM_MOD",
+    "AUTHOR",
+    "DIST_OBJ_PRED"
+    )], 
+  quanti.sup = 5,
+  method="Burt",
+  graph = F)
+
+fviz_screeplot(
+  mca.b,
+  addlabels = TRUE,
+  barfill="#1B9E77",
+  barcolor="#1B9E77",
+  main="Eigenvalues"
+  ) + 
+  theme_get()
+
+mca.plot <- plot(
+  mca.b,
+  invisible = "ind",
+  graph.type =  "ggplot"
+  ) +
+  theme_get()
+mca.plot
 ```

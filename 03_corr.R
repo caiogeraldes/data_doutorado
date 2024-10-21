@@ -42,4 +42,4 @@ d <- d %>% mutate(
   CHECAR_DIST = NULL
 )
 
-write_csv(d, "./processed/data_final.csv")
+write_csv(d, "./processed/data_corr.csv")

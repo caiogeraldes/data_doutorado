@@ -1,0 +1,260 @@
+
+R version 4.4.1 (2024-06-14) -- "Race for Your Life"
+Copyright (C) 2024 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu
+
+R é um software livre e vem sem GARANTIA ALGUMA.
+Você pode redistribuí-lo sob certas circunstâncias.
+Digite 'license()' ou 'licence()' para detalhes de distribuição.
+
+R é um projeto colaborativo com muitos contribuidores.
+Digite 'contributors()' para obter mais informações e
+'citation()' para saber como citar o R ou pacotes do R em publicações.
+
+Digite 'demo()' para demonstrações, 'help()' para o sistema on-line de ajuda,
+ou 'help.start()' para abrir o sistema de ajuda em HTML no seu navegador.
+Digite 'q()' para sair do R.
+
+[Área de trabalho anterior carregada]
+
+> ## Preparação
+> library(tidyverse)
+── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
+✔ dplyr     1.1.4     ✔ readr     2.1.5
+✔ forcats   1.0.0     ✔ stringr   1.5.1
+✔ ggplot2   3.5.1     ✔ tibble    3.2.1
+✔ lubridate 1.9.3     ✔ tidyr     1.3.1
+✔ purrr     1.0.2     
+── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+✖ dplyr::filter() masks stats::filter()
+✖ dplyr::lag()    masks stats::lag()
+ℹ Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
+> library(readxl)
+> 
+> d <- read_csv("./processed/data_corr.csv")
+Rows: 343 Columns: 32
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr (24): AUTHOR, WORK, LOCATION, TEXT, Vm, VM_LEMMA, Vinf, VINF_A, VINF_B, ...
+dbl  (2): ID, DIST_OBJ_PRED
+lgl  (6): VM_PERSONAL, VM_MOD, Vinf_Cop, Attr, Attr_B, CHECK
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+> 
+> d <- d %>% mutate(
++   GENRE = ifelse(
++     AUTHOR == "Xenophon (0032)",
++     ifelse(
++       WORK %in% c(
++         "Anabasis (006)",
++         "Cyropaedia (007)",
++         "Hellenica (001)",
++         "Agesilaus (009)"
++       ),
++       "historiography",
++       ifelse(
++         WORK %in% c(
++           "Memorabilia (002)",
++           "Apology (005)",
++           "Hiero (008)",
++           "Economics (003)",
++           "Symposium (004)"
++         ),
++         "philosophical_dialogue",
++         ifelse(
++           WORK == "Constitution of the Lacedaemonians (010)",
++           "juridical",
++           "other"
++         )
++       )
++     ),
++     ifelse(
++       AUTHOR %in% c(
++         "Aeschylus (0085)",
++         "Aristophanes (0019)",
++         "Euripides (0006)",
++         "Sophocles (0011)"
++       ),
++       "drama",
++       ifelse(
++         AUTHOR %in% c(
++           "Herodotus (0016)",
++           "Thucydides (0003)"
++         ),
++         "historiography",
++         ifelse(
++           AUTHOR == "Plato (0059)",
++           "philosophical_dialogue",
++           "juridical"
++         )
++       )
++     )
++   )
++ )
+> d$GENRE
+  [1] "juridical"              "juridical"              "juridical"             
+  [4] "juridical"              "juridical"              "juridical"             
+  [7] "juridical"              "juridical"              "juridical"             
+ [10] "juridical"              "drama"                  "drama"                 
+ [13] "juridical"              "juridical"              "juridical"             
+ [16] "juridical"              "juridical"              "juridical"             
+ [19] "juridical"              "juridical"              "juridical"             
+ [22] "juridical"              "juridical"              "juridical"             
+ [25] "juridical"              "juridical"              "juridical"             
+ [28] "juridical"              "juridical"              "juridical"             
+ [31] "juridical"              "juridical"              "juridical"             
+ [34] "juridical"              "juridical"              "juridical"             
+ [37] "juridical"              "juridical"              "juridical"             
+ [40] "drama"                  "drama"                  "juridical"             
+ [43] "juridical"              "juridical"              "juridical"             
+ [46] "juridical"              "juridical"              "juridical"             
+ [49] "juridical"              "juridical"              "juridical"             
+ [52] "juridical"              "juridical"              "juridical"             
+ [55] "juridical"              "juridical"              "juridical"             
+ [58] "juridical"              "juridical"              "juridical"             
+ [61] "juridical"              "juridical"              "juridical"             
+ [64] "juridical"              "juridical"              "juridical"             
+ [67] "juridical"              "juridical"              "juridical"             
+ [70] "juridical"              "juridical"              "juridical"             
+ [73] "juridical"              "juridical"              "juridical"             
+ [76] "juridical"              "juridical"              "juridical"             
+ [79] "juridical"              "juridical"              "juridical"             
+ [82] "juridical"              "juridical"              "juridical"             
+ [85] "juridical"              "drama"                  "historiography"        
+ [88] "historiography"         "historiography"         "historiography"        
+ [91] "historiography"         "historiography"         "historiography"        
+ [94] "historiography"         "historiography"         "historiography"        
+ [97] "historiography"         "historiography"         "historiography"        
+[100] "historiography"         "historiography"         "historiography"        
+[103] "historiography"         "historiography"         "historiography"        
+[106] "historiography"         "historiography"         "historiography"        
+[109] "historiography"         "historiography"         "historiography"        
+[112] "historiography"         "historiography"         "historiography"        
+[115] "historiography"         "historiography"         "historiography"        
+[118] "historiography"         "historiography"         "historiography"        
+[121] "historiography"         "historiography"         "historiography"        
+[124] "historiography"         "historiography"         "historiography"        
+[127] "historiography"         "historiography"         "historiography"        
+[130] "historiography"         "juridical"              "juridical"             
+[133] "juridical"              "juridical"              "juridical"             
+[136] "juridical"              "juridical"              "juridical"             
+[139] "juridical"              "juridical"              "juridical"             
+[142] "juridical"              "juridical"              "juridical"             
+[145] "juridical"              "juridical"              "juridical"             
+[148] "juridical"              "juridical"              "juridical"             
+[151] "juridical"              "juridical"              "juridical"             
+[154] "juridical"              "juridical"              "juridical"             
+[157] "juridical"              "juridical"              "juridical"             
+[160] "juridical"              "juridical"              "juridical"             
+[163] "juridical"              "juridical"              "juridical"             
+[166] "juridical"              "juridical"              "juridical"             
+[169] "juridical"              "juridical"              "juridical"             
+[172] "juridical"              "juridical"              "juridical"             
+[175] "juridical"              "juridical"              "juridical"             
+[178] "juridical"              "juridical"              "juridical"             
+[181] "juridical"              "juridical"              "juridical"             
+[184] "juridical"              "juridical"              "juridical"             
+[187] "juridical"              "philosophical_dialogue" "philosophical_dialogue"
+[190] "philosophical_dialogue" "philosophical_dialogue" "philosophical_dialogue"
+[193] "philosophical_dialogue" "philosophical_dialogue" "philosophical_dialogue"
+[196] "philosophical_dialogue" "philosophical_dialogue" "philosophical_dialogue"
+[199] "philosophical_dialogue" "philosophical_dialogue" "philosophical_dialogue"
+[202] "philosophical_dialogue" "philosophical_dialogue" "philosophical_dialogue"
+[205] "philosophical_dialogue" "philosophical_dialogue" "philosophical_dialogue"
+[208] "philosophical_dialogue" "philosophical_dialogue" "philosophical_dialogue"
+[211] "philosophical_dialogue" "philosophical_dialogue" "philosophical_dialogue"
+[214] "philosophical_dialogue" "philosophical_dialogue" "philosophical_dialogue"
+[217] "philosophical_dialogue" "philosophical_dialogue" "philosophical_dialogue"
+[220] "philosophical_dialogue" "philosophical_dialogue" "philosophical_dialogue"
+[223] "philosophical_dialogue" "philosophical_dialogue" "philosophical_dialogue"
+[226] "philosophical_dialogue" "philosophical_dialogue" "philosophical_dialogue"
+[229] "philosophical_dialogue" "philosophical_dialogue" "philosophical_dialogue"
+[232] "philosophical_dialogue" "philosophical_dialogue" "philosophical_dialogue"
+[235] "philosophical_dialogue" "philosophical_dialogue" "philosophical_dialogue"
+[238] "philosophical_dialogue" "philosophical_dialogue" "philosophical_dialogue"
+[241] "philosophical_dialogue" "philosophical_dialogue" "philosophical_dialogue"
+[244] "philosophical_dialogue" "philosophical_dialogue" "philosophical_dialogue"
+[247] "philosophical_dialogue" "philosophical_dialogue" "drama"                 
+[250] "drama"                  "drama"                  "historiography"        
+[253] "historiography"         "historiography"         "historiography"        
+[256] "historiography"         "historiography"         "historiography"        
+[259] "historiography"         "historiography"         "historiography"        
+[262] "historiography"         "historiography"         "historiography"        
+[265] "historiography"         "historiography"         "historiography"        
+[268] "historiography"         "historiography"         "historiography"        
+[271] "historiography"         "historiography"         "historiography"        
+[274] "historiography"         "historiography"         "historiography"        
+[277] "historiography"         "historiography"         "historiography"        
+[280] "historiography"         "historiography"         "historiography"        
+[283] "historiography"         "historiography"         "historiography"        
+[286] "historiography"         "historiography"         "historiography"        
+[289] "historiography"         "historiography"         "philosophical_dialogue"
+[292] "historiography"         "historiography"         "historiography"        
+[295] "juridical"              "historiography"         "historiography"        
+[298] "historiography"         "historiography"         "historiography"        
+[301] "historiography"         "historiography"         "historiography"        
+[304] "historiography"         "historiography"         "philosophical_dialogue"
+[307] "other"                  "philosophical_dialogue" "philosophical_dialogue"
+[310] "philosophical_dialogue" "philosophical_dialogue" "philosophical_dialogue"
+[313] "philosophical_dialogue" "other"                  "philosophical_dialogue"
+[316] "historiography"         "philosophical_dialogue" "philosophical_dialogue"
+[319] "philosophical_dialogue" "historiography"         "historiography"        
+[322] "historiography"         "historiography"         "historiography"        
+[325] "historiography"         "historiography"         "historiography"        
+[328] "historiography"         "historiography"         "historiography"        
+[331] "historiography"         "historiography"         "historiography"        
+[334] "historiography"         "historiography"         "historiography"        
+[337] "historiography"         "historiography"         "historiography"        
+[340] "historiography"         "philosophical_dialogue" "other"                 
+[343] "juridical"             
+> 
+> d <- d %>% mutate(DIALECT = ifelse(
++   AUTHOR == "Herodotus (0016)", "jonic", "attic"
++ ))
+> d$DIALECT
+  [1] "attic" "attic" "attic" "attic" "attic" "attic" "attic" "attic" "attic"
+ [10] "attic" "attic" "attic" "attic" "attic" "attic" "attic" "attic" "attic"
+ [19] "attic" "attic" "attic" "attic" "attic" "attic" "attic" "attic" "attic"
+ [28] "attic" "attic" "attic" "attic" "attic" "attic" "attic" "attic" "attic"
+ [37] "attic" "attic" "attic" "attic" "attic" "attic" "attic" "attic" "attic"
+ [46] "attic" "attic" "attic" "attic" "attic" "attic" "attic" "attic" "attic"
+ [55] "attic" "attic" "attic" "attic" "attic" "attic" "attic" "attic" "attic"
+ [64] "attic" "attic" "attic" "attic" "attic" "attic" "attic" "attic" "attic"
+ [73] "attic" "attic" "attic" "attic" "attic" "attic" "attic" "attic" "attic"
+ [82] "attic" "attic" "attic" "attic" "attic" "jonic" "jonic" "jonic" "jonic"
+ [91] "jonic" "jonic" "jonic" "jonic" "jonic" "jonic" "jonic" "jonic" "jonic"
+[100] "jonic" "jonic" "jonic" "jonic" "jonic" "jonic" "jonic" "jonic" "jonic"
+[109] "jonic" "jonic" "jonic" "jonic" "jonic" "jonic" "jonic" "jonic" "jonic"
+[118] "jonic" "jonic" "jonic" "jonic" "jonic" "jonic" "jonic" "jonic" "jonic"
+[127] "jonic" "jonic" "jonic" "jonic" "attic" "attic" "attic" "attic" "attic"
+[136] "attic" "attic" "attic" "attic" "attic" "attic" "attic" "attic" "attic"
+[145] "attic" "attic" "attic" "attic" "attic" "attic" "attic" "attic" "attic"
+[154] "attic" "attic" "attic" "attic" "attic" "attic" "attic" "attic" "attic"
+[163] "attic" "attic" "attic" "attic" "attic" "attic" "attic" "attic" "attic"
+[172] "attic" "attic" "attic" "attic" "attic" "attic" "attic" "attic" "attic"
+[181] "attic" "attic" "attic" "attic" "attic" "attic" "attic" "attic" "attic"
+[190] "attic" "attic" "attic" "attic" "attic" "attic" "attic" "attic" "attic"
+[199] "attic" "attic" "attic" "attic" "attic" "attic" "attic" "attic" "attic"
+[208] "attic" "attic" "attic" "attic" "attic" "attic" "attic" "attic" "attic"
+[217] "attic" "attic" "attic" "attic" "attic" "attic" "attic" "attic" "attic"
+[226] "attic" "attic" "attic" "attic" "attic" "attic" "attic" "attic" "attic"
+[235] "attic" "attic" "attic" "attic" "attic" "attic" "attic" "attic" "attic"
+[244] "attic" "attic" "attic" "attic" "attic" "attic" "attic" "attic" "attic"
+[253] "attic" "attic" "attic" "attic" "attic" "attic" "attic" "attic" "attic"
+[262] "attic" "attic" "attic" "attic" "attic" "attic" "attic" "attic" "attic"
+[271] "attic" "attic" "attic" "attic" "attic" "attic" "attic" "attic" "attic"
+[280] "attic" "attic" "attic" "attic" "attic" "attic" "attic" "attic" "attic"
+[289] "attic" "attic" "attic" "attic" "attic" "attic" "attic" "attic" "attic"
+[298] "attic" "attic" "attic" "attic" "attic" "attic" "attic" "attic" "attic"
+[307] "attic" "attic" "attic" "attic" "attic" "attic" "attic" "attic" "attic"
+[316] "attic" "attic" "attic" "attic" "attic" "attic" "attic" "attic" "attic"
+[325] "attic" "attic" "attic" "attic" "attic" "attic" "attic" "attic" "attic"
+[334] "attic" "attic" "attic" "attic" "attic" "attic" "attic" "attic" "attic"
+[343] "attic"
+> 
+> write_csv(d, "./processed/data_final.csv")
+> 
+> proc.time()
+  usuário   sistema decorrido 
+    3.328     0.416     3.707 

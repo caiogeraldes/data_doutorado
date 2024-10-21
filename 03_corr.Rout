@@ -1,0 +1,95 @@
+
+R version 4.4.1 (2024-06-14) -- "Race for Your Life"
+Copyright (C) 2024 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu
+
+R é um software livre e vem sem GARANTIA ALGUMA.
+Você pode redistribuí-lo sob certas circunstâncias.
+Digite 'license()' ou 'licence()' para detalhes de distribuição.
+
+R é um projeto colaborativo com muitos contribuidores.
+Digite 'contributors()' para obter mais informações e
+'citation()' para saber como citar o R ou pacotes do R em publicações.
+
+Digite 'demo()' para demonstrações, 'help()' para o sistema on-line de ajuda,
+ou 'help.start()' para abrir o sistema de ajuda em HTML no seu navegador.
+Digite 'q()' para sair do R.
+
+[Área de trabalho anterior carregada]
+
+> ## Preparação
+> library(tidyverse)
+── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
+✔ dplyr     1.1.4     ✔ readr     2.1.5
+✔ forcats   1.0.0     ✔ stringr   1.5.1
+✔ ggplot2   3.5.1     ✔ tibble    3.2.1
+✔ lubridate 1.9.3     ✔ tidyr     1.3.1
+✔ purrr     1.0.2     
+── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+✖ dplyr::filter() masks stats::filter()
+✖ dplyr::lag()    masks stats::lag()
+ℹ Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
+> library(readxl)
+> library(insight)
+> 
+> d <- read_csv("./processed/data_dist.csv")
+Rows: 343 Columns: 34
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr (25): AUTHOR, WORK, LOCATION, TEXT, Vm, VM_LEMMA, Vinf, VINF_A, VINF_B, ...
+dbl  (2): ID, DIST_OBJ_PRED
+lgl  (7): VM_PERSONAL, VM_MOD, Vinf_Cop, Attr, Attr_B, CHECK, CHECAR_DIST
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+> 
+> # Corrigir 125
+> d[125, ]$TEXT <- "τὴν δέ οἱ συμβουλεῦσαι τῶν παίδων ἐόντων ἓξ τοὺς δύο ἐπὶ τὴν πυρὴν ἐκτείναντα γεφυρῶσαι τὸ καιόμενον, αὐτοὺς δὲ ἐπ᾽ ἐκείνων ἐπιβαίνοντας ἐκσώζεσθαι. ταῦτα ποιῆσαι τὸν Σέσωστριν, καὶ δύο μὲν τῶν παίδων κατακαῆναι τρόπῳ τοιούτῳ, τοὺς δὲ λοιποὺς ἀποσωθῆναι ἅμα τῷ πατρί." # nolint
+> d[125, ]$DIST_OBJ_PRED <- 11
+> 
+> # Corrigir 61 -> inf e pred trocados
+> (pred <- d[61, ]$Vinf)
+[1] "ἁψαμένῳ"
+> (vinf <- d[61, ]$Pred)
+[1] "ἀφῖχθαι"
+> d[61, ]$Vinf <- vinf
+> d[61, ]$Pred <- pred
+> 
+> # Corrigir 148  -> obj e pred trocados
+> (pred <- d[148, ]$Obj)
+[1] "λαμπροῖς, πλουσίοις, δεσπόταις"
+> (obj <- d[148, ]$Pred)
+[1] "ἅπασι"
+> d[148, ]$Obj <- obj
+> d[148, ]$Pred <- pred
+> 
+> # Corrigir 338  -> Inf e pred trocados
+> (pred <- d[338, ]$Vinf)
+[1] "ἐλθόντα"
+> (vinf <- d[338, ]$Pred)
+[1] "ἀνακοινῶσαι"
+> d[338, ]$Vinf <- vinf
+> d[338, ]$Pred <- pred
+> 
+> # Checar 120
+> d[120, ]$TEXT <- "ἐπεὶ δὲ τοῖσι Ὑπερβορέοισι τοὺς ἀποπεμφθέντας ὀπίσω οὐκ ἀπονοστέειν, δεινὰ ποιευμένους εἰ σφέας αἰεὶ καταλάμψεται ἀποστέλλοντας μὴ ἀποδέκεσθαι, οὕτω δὴ φέροντας ἐς τοὺς οὔρους τὰ ἱρὰ ἐνδεδεμένα ἐν πυρῶν καλάμῃ τοῖσι πλησιοχώροισι ἐπισκήπτειν κελεύοντας προπέμπειν σφέα ἀπὸ ἑωυτῶν ἐς ἄλλο ἔθνος." # nolint
+> (pred <- d[120, ]$Obj)
+[1] "τοῖσι πλησιοχώροισι"
+> (obj <- d[120, ]$Pred)
+[1] "κελεύοντας"
+> d[120, ]$Obj <- obj
+> d[120, ]$Pred <- pred
+> 
+> # Corrigir attr de 106
+> d[106, ]$Attr <- TRUE
+> 
+> d <- d %>% mutate(
++   t_c = NULL,
++   CHECAR_DIST = NULL
++ )
+> 
+> write_csv(d, "./processed/data_corr.csv")
+> 
+> proc.time()
+  usuário   sistema decorrido 
+    3.444     0.396     3.928 
